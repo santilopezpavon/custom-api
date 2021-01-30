@@ -1,0 +1,3 @@
+<?php
+    function custom_api_preprocess_html(&$variables) {
+    }

@@ -1,0 +1,12 @@
+services:
+ custom_api.normalizer.custom_entity_normalizer:
+  class: Drupal\custom_api\Normalizer\CustomEntityNormalizer
+  arguments: ['@entity.manager']
+  tags:
+    - { name: normalizer, priority: 9 }
+ custom_api.normalizer.custom_field_normalizer:
+  class: Drupal\custom_api\Normalizer\CustomFieldNormalizer
+  tags:
+    - { name: normalizer, priority: 10 }
+ custom_api.entity_normalize:
+  class: Drupal\custom_api\Services\EntityNormalizer

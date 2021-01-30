@@ -1,0 +1,5 @@
+type: module
+name: Custom Api
+description: 'Custom API.'
+package: API
+core_version_requirement: ^8.8 || ^9
