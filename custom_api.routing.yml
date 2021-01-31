@@ -4,3 +4,21 @@ custom_api.getentity:
     _controller: '\Drupal\custom_api\Controller\ApiController::getEntityIndex'
   requirements:
     _access: 'TRUE'
+custom_api.createentity:
+  path: '/api/{entity_type}'
+  defaults:
+    _controller: '\Drupal\custom_api\Controller\ApiController::createEntity'
+  requirements:
+    _access: 'TRUE'
+custom_api.updateentity:
+  path: '/api/{entity_type}/{id}'
+  defaults:
+    _controller: '\Drupal\custom_api\Controller\ApiController::updateEntity'
+  requirements:
+    _access: 'TRUE'
+custom_api.deleteentity:
+  path: '/api/{entity_type}/delete/{id}'
+  defaults:
+    _controller: '\Drupal\custom_api\Controller\ApiController::deleteEntity'
+  requirements:
+    _access: 'TRUE'

@@ -9,10 +9,39 @@ class EntityNormalizer {
     ];
 
     private $lang = NULL;
-
+    private $content = NULL;
+    
     public function __construct() {
         $request = \Drupal::request();
         $this->lang = $request->query->get("lang");
+        $this->content = json_decode(\Drupal::request()->getContent(), true);
+    }
+    
+
+    public function createUpdateEntity($entity_type, $id = null) {
+        $entity = NULL;
+        $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
+        if(!empty($id)) {            
+            $entity = $storage->load($id); 
+        }
+        if(is_array($this->content)) {
+            if($entity === NULL) {
+                $entity = $storage->create($this->content); 
+            } else {
+                foreach ($this->content as $key => $value) {
+                    $entity->set($key, $value);
+                }
+            }            
+        }
+        if($entity !== NULL) {
+            $entity->save();
+        }
+        return $entity;
+    }
+
+    public function deleteEntity($entity_type, $id) {
+        $entity = \Drupal::entityTypeManager()->getStorage($entity_type)->load($id);
+        $entity->delete();
     }
     
     public function cleanEntity(&$values) {
@@ -27,6 +56,11 @@ class EntityNormalizer {
         if($entity->hasTranslation($this->lang)){
             $entity = $entity->getTranslation($this->lang);
         }
+        return $this->convertJson($entity);
+
+    }
+
+    public function convertJson($entity) {
         return json_decode(\Drupal::service("serializer")->serialize($entity, 'json'), true);
 
     }
