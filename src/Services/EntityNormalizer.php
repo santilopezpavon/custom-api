@@ -4,17 +4,22 @@ use Drupal\Core\Url;
 
 
 class EntityNormalizer {
+    
     private $clean = [
         'uuid', 'uid', 'vid', "revision_timestamp", "revision_uid", "revision_log", "path", "revision_translation_affected"
     ];
 
     private $lang = NULL;
+    
     private $content = NULL;
+
+    public $visualization = NULL;
     
     public function __construct() {
         $request = \Drupal::request();
         $this->lang = $request->query->get("lang");
         $this->content = json_decode(\Drupal::request()->getContent(), true);
+        $this->visualization = $request->query->get("mode");
     }
     
 
@@ -64,6 +69,11 @@ class EntityNormalizer {
         return json_decode(\Drupal::service("serializer")->serialize($entity, 'json'), true);
 
     }
+    
+    public function processField(&$value_field) {
+        $this->cleanField($value_field);
+        
+    }
 
     public function cleanField(&$value_field) {
         for ($i=0; $i < count($value_field) ; $i++) { 
@@ -71,13 +81,18 @@ class EntityNormalizer {
             if(array_key_exists("value", $current)) {
                 $current = $current["value"];
             } else if (array_key_exists("target_id", $current) && array_key_exists("target_type", $current) && is_numeric($current["target_id"])) {
-                $current = $this->getEntity($current["target_type"], $current["target_id"]);
-            }
-            $this->processImg($current);
-        }        
+                if($current["target_type"] == 'file') {
+                    $this->processFile($current);
+                } else {
+                   $current = $this->getEntity($current["target_type"], $current["target_id"]);
+
+                }
+            } 
+        }     
+        
     }
 
-    public function processImg(&$value_field) {
+    public function processFile(&$value_field) {
         if(array_key_exists("uri", $value_field)) {
             $uri = $value_field["uri"][0];
             $url = file_create_url($uri);           
