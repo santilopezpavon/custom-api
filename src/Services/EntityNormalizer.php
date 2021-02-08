@@ -55,27 +55,27 @@ class EntityNormalizer {
         }        
     }
 
-    public function getEntity($target_type, $target_id) {
+    public function getEntity($target_type, $target_id, $schema = []) {
         $storage = \Drupal::entityTypeManager()->getStorage($target_type);
         $entity = $storage->load($target_id);
         if($entity->hasTranslation($this->lang)){
             $entity = $entity->getTranslation($this->lang);
         }
-        return $this->convertJson($entity);
+        return $this->convertJson($entity, $schema);
 
     }
 
-    public function convertJson($entity) {
-        return json_decode(\Drupal::service("serializer")->serialize($entity, 'json'), true);
+    public function convertJson($entity, $schema = []) {
+        return json_decode(\Drupal::service("serializer")->serialize($entity, 'json', $schema), true);
 
     }
     
-    public function processField(&$value_field) {
-        $this->cleanField($value_field);
+    public function processField(&$value_field, &$field, $schema= []) {
+        $this->cleanField($value_field, $field, $schema);
         
     }
 
-    public function cleanField(&$value_field) {
+    public function cleanField(&$value_field, $field, $schema= []) {
         for ($i=0; $i < count($value_field) ; $i++) { 
             $current = &$value_field[$i];
             if(array_key_exists("value", $current)) {
@@ -84,11 +84,17 @@ class EntityNormalizer {
                 if($current["target_type"] == 'file') {
                     $this->processFile($current);
                 } else {
-                   $current = $this->getEntity($current["target_type"], $current["target_id"]);
+                    $name = $field->getName();
+                    if(array_key_exists($name, $schema)) {
+                        $schema = $schema[$name];
+                    } else {
+                        $schema = [];
+                    }
+                   $current = $this->getEntity($current["target_type"], $current["target_id"], $schema);
 
                 }
             } 
-        }     
+        }   
         
     }
 

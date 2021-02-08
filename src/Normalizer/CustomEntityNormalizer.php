@@ -12,22 +12,32 @@ class CustomEntityNormalizer extends ContentEntityNormalizer {
    */
   public function normalize($entity, $format = NULL, array $context = array()) {    
     $attributes = parent::normalize($entity, $format, $context);
-    
-    $classString = "\\Drupal\custom_api\\visualization\\NodePage";
-    $teaser = $classString::existo();
+    $entityNormalizer = \Drupal::service("custom_api.entity_normalize");
+    $entityNormalizer->cleanEntity($attributes);
+    if(!empty($context)) {
+      foreach ($attributes as $key => $value) {
+       if(!array_key_exists($key, $context)) {
+        unset($attributes[$key]);
+       }
+      }
+    }
+
+
+    /*$classString = "\\Drupal\custom_api\\visualization\\NodePage";
+  $teaser = $classString::existo();
   
     
     $id_type = ucfirst($entity->getEntityType()->id());
     $bundle = ucfirst($entity->bundle());
 
     $entityNormalizer = \Drupal::service("custom_api.entity_normalize");
-    $entityNormalizer->cleanEntity($attributes);   
+    $entityNormalizer->cleanEntity($attributes);*/   
 
-    foreach ($attributes as $key => $value) {
+    /*foreach ($attributes as $key => $value) {
       if(empty($value)) {
         unset($attributes[$key]);
       }
-    }
+    }*/
     
     
     //kint($teaser);

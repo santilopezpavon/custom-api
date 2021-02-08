@@ -9,7 +9,20 @@ class ApiController extends ControllerBase {
 
     public function getEntityIndex($entity_type, $id) {
         $normalize = \Drupal::service("custom_api.entity_normalize");
-        $output = $normalize->getEntity($entity_type, $id);
+        $schema = [
+            "title" => [],
+            "field_articles" => [
+                "nid" => [],
+                "title" => [],
+                "field_image" => [],
+                "field_media" => [
+                    "field_media_image" => []
+                ],
+            ],            
+        ];
+
+
+        $output = $normalize->getEntity($entity_type, $id, $schema);
         return new JsonResponse($output, 200);
     }
 

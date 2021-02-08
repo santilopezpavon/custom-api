@@ -13,11 +13,12 @@ class NodePage {
             "NodeArticle" => [
                 "title" => [],
                 'field_image' => [],
-                "field_media" => []           
+                "field_media" => [],
+                "MediaImage" => [
+                    "field_media_image" => []
+                ]           
             ],
-            "MediaImage" => [
-                "field_media_image" => []
-            ]
+            
         ];
     }
 }
