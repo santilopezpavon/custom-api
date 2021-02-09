@@ -1,17 +1,17 @@
 custom_api.getentity:
-  path: '/api/{entity_type}/{id}'
+  path: '/api/{entity_type}/get/{id}'
   defaults:
     _controller: '\Drupal\custom_api\Controller\ApiController::getEntityIndex'
   requirements:
     _access: 'TRUE'
 custom_api.createentity:
-  path: '/api/{entity_type}'
+  path: '/api/{entity_type}/create'
   defaults:
     _controller: '\Drupal\custom_api\Controller\ApiController::createEntity'
   requirements:
     _access: 'TRUE'
 custom_api.updateentity:
-  path: '/api/{entity_type}/{id}'
+  path: '/api/{entity_type}/update/{id}'
   defaults:
     _controller: '\Drupal\custom_api\Controller\ApiController::updateEntity'
   requirements:

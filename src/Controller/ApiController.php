@@ -9,7 +9,9 @@ class ApiController extends ControllerBase {
 
     public function getEntityIndex($entity_type, $id) {
         $normalize = \Drupal::service("custom_api.entity_normalize");
-        $schema = [
+        $resp = \Drupal::service("custom_api.entity_responses");
+        
+        /*$schema = [
             "title" => [],
             "field_articles" => [
                 "nid" => [],
@@ -19,11 +21,31 @@ class ApiController extends ControllerBase {
                     "field_media_image" => []
                 ],
             ],            
-        ];
+        ];*/
 
+        /**
+         * { 
+                "schema": {
+                "title": []
+            }
+                
+            }
+         
+         */
+        $params = json_decode(\Drupal::request()->getContent(), true);
+        if(array_key_exists("schema", $params)) {
+            $schema = $params["schema"];
+        } else {
+            $schema = [];
+        }
+        try {
+            $output = $normalize->getEntity($entity_type, $id, $schema);
+            return $resp->prepareResponse($output);
+        } catch (\Exception $th) {
+            return $resp->prepareError($th);
+        } 
 
-        $output = $normalize->getEntity($entity_type, $id, $schema);
-        return new JsonResponse($output, 200);
+        
     }
 
     public function createEntity($entity_type) {

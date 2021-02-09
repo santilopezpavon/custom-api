@@ -15,11 +15,9 @@ class CustomFieldNormalizer extends FieldNormalizer {
    * {@inheritdoc}
    */
   public function normalize($field, $format = NULL, array $context = array()) {    
-   
-    
     $value_field = parent::normalize($field, $format, $context);
     \Drupal::service("custom_api.entity_normalize")->processField($value_field, $field, $context);
-
+    return $value_field; 
     /*$type = $field->getFieldDefinition()->getType();
     $name = $field->getName();
     
@@ -31,6 +29,6 @@ class CustomFieldNormalizer extends FieldNormalizer {
     
    
     
-    return $value_field; 
+    
   }
 }
