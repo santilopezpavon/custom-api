@@ -45,9 +45,9 @@ class EntityNormalizer {
         }
         if($entity !== NULL) {
             $entity->save();
+            return $this->convertJson($entity, $schema); 
         }
-        return $this->convertJson($entity, $schema); 
-        return $entity;
+        throw new \Exception("The entity is not created", 1);
     }
 
     public function deleteEntity($entity_type, $id) {
@@ -98,23 +98,10 @@ class EntityNormalizer {
                     $image_uri = $file->getFileUri();
                     $file_type = $file->getMimeType();
                     $name = $field->getName();
-                    if(strpos($file_type, "image/") !== FALSE) {
-                        $img_styles = [];
-                        if(array_key_exists($name, $schema)) {
-                            $options = $schema[$name];
-                            if(!empty($options)){ 
-                                
-                                foreach ($options as $option) {
-                                    $style = ImageStyle::load($option);
-                                    $url = $style->buildUrl($image_uri);
-                                    $img_styles[$option] = $url;
-                                }
-                            }                            
-                        }
-                        $this->processFile($current, $img_styles);
-                    } else {
-                        $this->processFile($current);
-                    }
+                    if($this->isImage($file_type)) {
+                        $img_styles = $this->processImageStyle($name, $schema, $image_uri);                      
+                    } 
+                    $this->processFile($current);
                     
                 } else {
                     $name = $field->getName();
@@ -131,6 +118,26 @@ class EntityNormalizer {
         
     }
 
+    public function processImageStyle($name, $schema, $image_uri) {
+        $img_styles = [];
+        if(array_key_exists($name, $schema)) {
+            $options = $schema[$name];
+            if(!empty($options)){ 
+                
+                foreach ($options as $option) {
+                    $style = ImageStyle::load($option);
+                    $url = $style->buildUrl($image_uri);
+                    $img_styles[$option] = $url;
+                }
+            }                            
+        }
+        return $img_styles;
+    }
+
+    public function isImage($file_type) {
+        return strpos($file_type, "image/") !== FALSE;
+    }
+
     public function processFile(&$value_field, $img_styles = []) {
         if(array_key_exists("uri", $value_field)) {
             $uri = $value_field["uri"][0];
@@ -140,8 +147,6 @@ class EntityNormalizer {
         foreach ($img_styles as $key => $value) {
             $value_field[$key] = $value;
         }
-
-
     }
     
 }
