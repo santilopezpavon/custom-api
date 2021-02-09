@@ -1,7 +1,7 @@
 services:
  custom_api.normalizer.custom_entity_normalizer:
   class: Drupal\custom_api\Normalizer\CustomEntityNormalizer
-  arguments: ['@entity.manager']
+  arguments: ['@entity_type.manager', '@entity_type.repository', '@entity_field.manager']
   tags:
     - { name: normalizer, priority: 9 }
  custom_api.normalizer.custom_field_normalizer:
