@@ -1,6 +1,8 @@
 <?php
 namespace Drupal\custom_api\Services;
 use Drupal\Core\Url;
+use Drupal\file\Entity\File;
+use Drupal\image\Entity\ImageStyle;
 
 
 class EntityNormalizer {
@@ -23,13 +25,16 @@ class EntityNormalizer {
     }
     
 
-    public function createUpdateEntity($entity_type, $id = null) {
+    public function createUpdateEntity($entity_type, $id = null, $schema = []) {
         $entity = NULL;
         $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
         if(!empty($id)) {            
             $entity = $storage->load($id); 
         }
         if(is_array($this->content)) {
+            if(array_key_exists("schema", $this->content)) {
+                unset($this->content["schema"]);
+            }
             if($entity === NULL) {
                 $entity = $storage->create($this->content); 
             } else {
@@ -41,6 +46,7 @@ class EntityNormalizer {
         if($entity !== NULL) {
             $entity->save();
         }
+        return $this->convertJson($entity, $schema); 
         return $entity;
     }
 
@@ -82,7 +88,28 @@ class EntityNormalizer {
                 $current = $current["value"];
             } else if (array_key_exists("target_id", $current) && array_key_exists("target_type", $current) && is_numeric($current["target_id"])) {
                 if($current["target_type"] == 'file') {
-                    $this->processFile($current);
+                    $file = File::load($current["target_id"]);
+                    $image_uri = $file->getFileUri();
+                    $file_type = $file->getMimeType();
+                    $name = $field->getName();
+                    if(strpos($file_type, "image/") !== FALSE) {
+                        $img_styles = [];
+                        if(array_key_exists($name, $schema)) {
+                            $options = $schema[$name];
+                            if(!empty($options)){ 
+                                
+                                foreach ($options as $option) {
+                                    $style = ImageStyle::load($option);
+                                    $url = $style->buildUrl($image_uri);
+                                    $img_styles[$option] = $url;
+                                }
+                            }                            
+                        }
+                        $this->processFile($current, $img_styles);
+                    } else {
+                        $this->processFile($current);
+                    }
+                    
                 } else {
                     $name = $field->getName();
                     if(array_key_exists($name, $schema)) {
@@ -98,12 +125,17 @@ class EntityNormalizer {
         
     }
 
-    public function processFile(&$value_field) {
+    public function processFile(&$value_field, $img_styles = []) {
         if(array_key_exists("uri", $value_field)) {
             $uri = $value_field["uri"][0];
             $url = file_create_url($uri);           
             $value_field["url"] = [$url];
         }
+        foreach ($img_styles as $key => $value) {
+            $value_field[$key] = $value;
+        }
+
+
     }
     
 }
