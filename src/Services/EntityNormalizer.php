@@ -52,7 +52,11 @@ class EntityNormalizer {
 
     public function deleteEntity($entity_type, $id) {
         $entity = \Drupal::entityTypeManager()->getStorage($entity_type)->load($id);
-        $entity->delete();
+        if(!empty($entity)) {
+            $entity->delete();
+        } else {
+            throw new \Exception("The entity not exists", 1);
+        }       
     }
     
     public function cleanEntity(&$values) {
@@ -64,11 +68,13 @@ class EntityNormalizer {
     public function getEntity($target_type, $target_id, $schema = []) {
         $storage = \Drupal::entityTypeManager()->getStorage($target_type);
         $entity = $storage->load($target_id);
-        if($entity->hasTranslation($this->lang)){
-            $entity = $entity->getTranslation($this->lang);
+        if(!empty($entity)) {
+            if($entity->hasTranslation($this->lang)){
+                $entity = $entity->getTranslation($this->lang);
+            }
+            return $this->convertJson($entity, $schema);
         }
-        return $this->convertJson($entity, $schema);
-
+        throw new \Exception("The entity not exists", 1);
     }
 
     public function convertJson($entity, $schema = []) {
