@@ -12,3 +12,6 @@ services:
   class: Drupal\custom_api\Services\EntityNormalizer
  custom_api.entity_responses:
   class: Drupal\custom_api\Services\GenerateResponses
+ custom_api.view_control:
+  class: Drupal\custom_api\Services\ViewControl
+  arguments: ['@custom_api.entity_normalize']

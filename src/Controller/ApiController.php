@@ -41,6 +41,25 @@ class ApiController extends ControllerBase {
         
     }
 
+    public function getViewIndex($view_id, $display) {
+        $resp = \Drupal::service("custom_api.entity_responses");
+        $view_service = \Drupal::service("custom_api.view_control");
+        $params = json_decode(\Drupal::request()->getContent(), true);
+        if(array_key_exists("schema", $params)) {
+            $schema = $params["schema"];
+        } else {
+            $schema = [];
+        }
+        
+        try {
+            $view = $view_service->getView($view_id, $display, $schema); 
+            return $resp->prepareResponse($view);
+        } catch (\Exception $th) {
+            return $resp->prepareError($th);
+        } 
+      
+    }
+
     public function createEntity($entity_type) {
         $normalize = \Drupal::service("custom_api.entity_normalize");
         $resp = \Drupal::service("custom_api.entity_responses");

@@ -13,6 +13,7 @@ the body have the Schema of the data that do yo need return:
 }
 ```
 
+
 ```json
 { 
   "schema": {
@@ -58,6 +59,25 @@ the body have the Schema of the data that do yo need return:
 
 ## Delete an Entity
 * /api/{entity_type}/delete/{id}
+
+## Implement View
+* /api/{view_id}/view/{display}
+* Params GET: 
+  * current_page [optional] the default value is 0
+  * lang [optional]
+* Body: 
+  * Schema [optional]
+  * Fiters [optional]
+```json 
+{
+  "schema": {
+  	"title": []
+  	
+  },
+  "title": "ad"
+}
+         
+``` 
 
 
 

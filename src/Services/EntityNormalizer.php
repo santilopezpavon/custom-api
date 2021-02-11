@@ -13,15 +13,19 @@ class EntityNormalizer {
 
     private $lang = NULL;
     
-    private $content = NULL;
+    public $content = NULL;
 
     public $visualization = NULL;
+
+    public $parametersGet = NULL;
     
     public function __construct() {
         $request = \Drupal::request();
         $this->lang = $request->query->get("lang");
         $this->content = json_decode(\Drupal::request()->getContent(), true);
         $this->visualization = $request->query->get("mode");
+        $this->parametersGet = \Drupal::request()->query->all();
+
     }
     
 
@@ -30,6 +34,9 @@ class EntityNormalizer {
         $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
         if(!empty($id)) {            
             $entity = $storage->load($id); 
+            if($entity->hasTranslation($this->lang)){
+                $entity = $entity->getTranslation($this->lang);
+            }
         }
         if(is_array($this->content)) {
             if(array_key_exists("schema", $this->content)) {
