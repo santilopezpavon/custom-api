@@ -13,7 +13,7 @@ class EntityNormalizer {
 
     private $lang = NULL;
     
-    public $content = NULL;
+    public $content = [];
 
     public $visualization = NULL;
 
@@ -21,8 +21,14 @@ class EntityNormalizer {
     
     public function __construct() {
         $request = \Drupal::request();
+
         $this->lang = $request->query->get("lang");
-        $this->content = json_decode(\Drupal::request()->getContent(), true);
+        
+        $content = \Drupal::request()->getContent();
+        if(!empty($content)) {
+            $this->content = json_decode($content, true);
+        }       
+        
         $this->visualization = $request->query->get("mode");
         $this->parametersGet = \Drupal::request()->query->all();
 
@@ -82,6 +88,16 @@ class EntityNormalizer {
             return $this->convertJson($entity, $schema);
         }
         throw new \Exception("The entity not exists", 1);
+    }
+
+    public function getEntityByAlias($target_type, $alias, $schema = []) {
+        $url = Url::fromUri('internal:' . $alias);
+        if ($url->isRouted()) {
+            $params = $url->getRouteParameters();
+            $entity_type = key($params);
+            return  $this->getEntity($target_type, $params[$target_type], $schema); 
+        }
+        throw new Exception("The entity not exists", 1);
     }
 
     public function convertJson($entity, $schema = []) {

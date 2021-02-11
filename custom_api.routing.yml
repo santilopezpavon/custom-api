@@ -4,6 +4,12 @@ custom_api.getentity:
     _controller: '\Drupal\custom_api\Controller\ApiController::getEntityIndex'
   requirements:
     _access: 'TRUE'
+custom_api.getentitybyalias:
+  path: '/api/{entity_type}/alias'
+  defaults:
+    _controller: '\Drupal\custom_api\Controller\ApiController::getEntityByAlias'
+  requirements:
+    _access: 'TRUE'
 custom_api.getview:
   path: '/api/{view_id}/view/{display}'
   defaults:

@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 
 class GenerateResponses {
+
     public function prepareResponse($data, $code = 200) {
         return new JsonResponse(["data" => $data], $code);
     }
@@ -19,4 +20,22 @@ class GenerateResponses {
         }
         return new JsonResponse(["message" => $message_final], $code);
     }
+
+    public function getBodyParameters() {
+        $content = \Drupal::request()->getContent();
+        if(!empty($content)) {
+            return json_decode(\Drupal::request()->getContent(), true);
+        }
+        return [];
+    }
+
+    public function getBodyParamater($name, $default = FALSE) {
+        $params = $this->getBodyParameters();
+        if(array_key_exists($name, $params)) {
+            return $params[$name];
+        } 
+        return $default;
+    }
+
+
 }

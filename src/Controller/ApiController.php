@@ -11,45 +11,37 @@ class ApiController extends ControllerBase {
         $normalize = \Drupal::service("custom_api.entity_normalize");
         $resp = \Drupal::service("custom_api.entity_responses");
 
-        $params = json_decode(\Drupal::request()->getContent(), true);
-        if(array_key_exists("schema", $params)) {
-            $schema = $params["schema"];
-        } else {
-            $schema = [];
-        }
+        $schema = $resp->getBodyParamater("schema", []);
 
-
-       /* $schema = [
-            "title" => [],
-            "field_articles" => [
-                "nid" => [],
-                "title" => [],
-                "field_image" => [],
-                "field_media" => [
-                    "field_media_image" => ["large"]
-                ],
-            ],            
-        ]; */
-        
         try {
             $output = $normalize->getEntity($entity_type, $id, $schema);
             return $resp->prepareResponse($output);
         } catch (\Exception $th) {
             return $resp->prepareError($th);
+        }        
+    }
+
+    public function getEntityByAlias($entity_type) {
+        $normalize = \Drupal::service("custom_api.entity_normalize");
+        $resp = \Drupal::service("custom_api.entity_responses");
+
+        $schema = $resp->getBodyParamater("schema", []);
+        $alias = $resp->getBodyParamater("alias");
+
+        try {
+            $output = $normalize->getEntityByAlias($entity_type, $alias, $schema);
+            return $resp->prepareResponse($output);
+        } catch (\Exception $th) {
+            return $resp->prepareError($th);
         } 
 
-        
     }
 
     public function getViewIndex($view_id, $display) {
         $resp = \Drupal::service("custom_api.entity_responses");
         $view_service = \Drupal::service("custom_api.view_control");
-        $params = json_decode(\Drupal::request()->getContent(), true);
-        if(array_key_exists("schema", $params)) {
-            $schema = $params["schema"];
-        } else {
-            $schema = [];
-        }
+
+        $schema = $resp->getBodyParamater("schema", []);
         
         try {
             $view = $view_service->getView($view_id, $display, $schema); 
@@ -64,12 +56,7 @@ class ApiController extends ControllerBase {
         $normalize = \Drupal::service("custom_api.entity_normalize");
         $resp = \Drupal::service("custom_api.entity_responses");
         
-        $params = json_decode(\Drupal::request()->getContent(), true);
-        if(array_key_exists("schema", $params)) {
-            $schema = $params["schema"];
-        } else {
-            $schema = [];
-        }
+        $schema = $resp->getBodyParamater("schema", []);
 
         try {
             $entity = $normalize->createUpdateEntity($entity_type, NULL, $schema);  
@@ -84,13 +71,7 @@ class ApiController extends ControllerBase {
         $normalize = \Drupal::service("custom_api.entity_normalize");
         $resp = \Drupal::service("custom_api.entity_responses");
 
-        $params = json_decode(\Drupal::request()->getContent(), true);
-        if(array_key_exists("schema", $params)) {
-            $schema = $params["schema"];
-        } else {
-            $schema = [];
-        }
-
+        $schema = $resp->getBodyParamater("schema", []);
 
         try {
             $entity = $normalize->createUpdateEntity($entity_type, $id, $schema);  

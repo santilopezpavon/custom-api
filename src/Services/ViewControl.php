@@ -28,7 +28,6 @@ class ViewControl {
         } else {
             $view->setCurrentPage(0); 
         }
-       // $view->setCurrentPage(2);
         //$filter_input = $view->getExposedInput();
         $view->setExposedInput($filters);
         $view->execute();
