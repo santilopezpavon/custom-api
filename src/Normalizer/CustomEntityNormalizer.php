@@ -14,6 +14,7 @@ class CustomEntityNormalizer extends ContentEntityNormalizer {
     $attributes = parent::normalize($entity, $format, $context);
     $entityNormalizer = \Drupal::service("custom_api.entity_normalize");
     $entityNormalizer->cleanEntity($attributes);
+  
     if(!empty($context)) {
       foreach ($attributes as $key => $value) {
        if(!array_key_exists($key, $context)) {

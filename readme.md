@@ -83,7 +83,7 @@ the body have the Schema of the data that do yo need return:
 * /api/{entity_type}/alias
 * Body: 
   * Schema [optional]
-  * alias [optional]
+  * alias [mandatory]
 ```json 
 {
   "schema": {
