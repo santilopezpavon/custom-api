@@ -41,6 +41,16 @@ class ApiController extends ControllerBase {
 
     }
 
+    public function getMenuById($id) {
+        $resp = \Drupal::service("custom_api.entity_responses");        
+        try {
+            $tree = \Drupal::service("custom_api.menu_generator")->getMenuItems($id); 
+            return $resp->prepareResponse($tree);
+        } catch (\Exception $th) {
+            return $resp->prepareError($th);
+        } 
+    }
+
     public function getViewIndex($view_id, $display) {
         $resp = \Drupal::service("custom_api.entity_responses");
         $view_service = \Drupal::service("custom_api.view_control");
@@ -122,11 +132,11 @@ class ApiController extends ControllerBase {
             $block_layout[$region] = array_keys($blocks);
         }
         kint($block_layout); */
-        $menu_tree = \Drupal::menuTree();
+       /* $menu_tree = \Drupal::menuTree();
         // Build the typical default set of menu tree parameters.
         $parameters = $menu_tree->getCurrentRouteMenuTreeParameters("main");
         // Load the tree based on this set of parameters.
-        $tree = $menu_tree->load("main", $parameters);
+        $tree = $menu_tree->load("main", $parameters);*/
 
         $tree = \Drupal::service("custom_api.menu_generator")->getMenuItems("main");
         kint($tree);

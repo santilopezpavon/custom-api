@@ -98,7 +98,12 @@ the body have the Schema of the data that do yo need return:
   "alias": "/ad"
 }
          
+
+         
 ``` 
+## Get a Menu
+* /api/{id_menu}/menu
+
 # Use the display configuration.
 
 If you wish use the display configuration of the Drupal UI (display manager), in the request, instead especify the fields in the schema, you can spcify the display:
@@ -109,7 +114,6 @@ If you wish use the display configuration of the Drupal UI (display manager), in
 ``` 
 
 # TODO:
-* Menu Endpoint
 * Multiple Field ER for load a View Inside a Node
   - View ID
   - Display ID
