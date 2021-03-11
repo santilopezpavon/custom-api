@@ -107,3 +107,11 @@ If you wish use the display configuration of the Drupal UI (display manager), in
 	"schema": {"display": "teaser"}	
 }
 ``` 
+
+# TODO:
+* Menu Endpoint
+* Multiple Field ER for load a View Inside a Node
+  - View ID
+  - Display ID
+  - Visualizatión (display)
+* Metatags Compatibility
