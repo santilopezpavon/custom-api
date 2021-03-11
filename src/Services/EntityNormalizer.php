@@ -126,7 +126,8 @@ class EntityNormalizer {
                     $file_type = $file->getMimeType();
                     $name = $field->getName();
                     if($this->isImage($file_type)) {
-                        $img_styles = $this->processImageStyle($name, $schema, $image_uri);                      
+                        $img_styles = $this->processImageStyle($name, $schema, $image_uri);  
+                        $current["styles_img"] = $img_styles;                    
                     } 
                     $this->processFile($current);
                     

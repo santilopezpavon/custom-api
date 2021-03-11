@@ -94,4 +94,11 @@ the body have the Schema of the data that do yo need return:
 }
          
 ``` 
-         
+# Use the display configuration.
+
+If you wish use the display configuration of the Drupal UI (display manager), in the request, instead especify the fields in the schema, you can spcify the display:
+```javascript 
+{
+	"schema": {"display": "teaser"}	
+}
+``` 

@@ -2,16 +2,20 @@
 namespace Drupal\custom_api\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\HttpFoundation\JsonResponse;
-
+use Symfony\Component\HttpFoundation\RequestStack;
 
 
 class ApiController extends ControllerBase {
+    
+    public $schema = FALSE;
 
     public function getEntityIndex($entity_type, $id) {
         $normalize = \Drupal::service("custom_api.entity_normalize");
         $resp = \Drupal::service("custom_api.entity_responses");
 
         $schema = $resp->getBodyParamater("schema", []);
+
+        // \Drupal::entityTypeManager()->getStorage('entity_view_display')->load($entity_type . '.' . $bundle . '.' . $view_mode);
 
         try {
             $output = $normalize->getEntity($entity_type, $id, $schema);
@@ -94,5 +98,38 @@ class ApiController extends ControllerBase {
         } catch (\Exception $th) {
             return $resp->prepareError($th);
         }  
+    }
+
+
+    public function test(){
+       /*  $master = \Drupal::requestStack()->getCurrentRequest();
+        $path = $master->get('path', '/');
+
+        $cache = new \Drupal\Core\Cache\CacheableMetadata();
+        // Cache a different version based on the Query Args.
+        $cache->addCacheContexts(['url.query_args:path']);
+        // Add the block list as a cache tag.
+        $cache->addCacheTags(\Drupal::entityTypeManager()->getDefinition('block')->getListCacheTags());
+
+        kint($path); */
+        /* $block_layout = [];
+        $theme = \Drupal::theme()->getActiveTheme();
+        $regions = $theme->getRegions();
+        foreach ($regions as $region) {  
+            $blocks = \Drupal::entityTypeManager()
+              ->getStorage('block')
+              ->loadByProperties(['theme' => $theme->getname(), 'region' => $region]);
+            $block_layout[$region] = array_keys($blocks);
+        }
+        kint($block_layout); */
+        $menu_tree = \Drupal::menuTree();
+        // Build the typical default set of menu tree parameters.
+        $parameters = $menu_tree->getCurrentRouteMenuTreeParameters("main");
+        // Load the tree based on this set of parameters.
+        $tree = $menu_tree->load("main", $parameters);
+
+        $tree = \Drupal::service("custom_api.menu_generator")->getMenuItems("main");
+        kint($tree);
+        kint("hola");
     }
 }

@@ -34,3 +34,9 @@ custom_api.deleteentity:
     _controller: '\Drupal\custom_api\Controller\ApiController::deleteEntity'
   requirements:
     _access: 'TRUE'
+custom_api.test:
+  path: '/api/test/test/test'
+  defaults:
+    _controller: '\Drupal\custom_api\Controller\ApiController::test'
+  requirements:
+    _access: 'TRUE'

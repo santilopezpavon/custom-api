@@ -15,3 +15,6 @@ services:
  custom_api.view_control:
   class: Drupal\custom_api\Services\ViewControl
   arguments: ['@custom_api.entity_normalize']
+ custom_api.menu_generator:
+  class: Drupal\custom_api\Services\MenuGenerator
+  arguments: ['@menu.link_tree']
