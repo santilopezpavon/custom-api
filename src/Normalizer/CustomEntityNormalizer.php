@@ -10,8 +10,7 @@ class CustomEntityNormalizer extends ContentEntityNormalizer {
 /**
    * {@inheritdoc}
    */
-  public function normalize($entity, $format = NULL, array $context = array()) {   
-    
+  public function normalize($entity, $format = NULL, array $context = array()) {     
     if(array_key_exists("display", $context)) {
       $display = $context["display"];
       $view_display_array = \Drupal::entityTypeManager()->getStorage('entity_view_display')->load($entity->getEntityType()->id() . '.' . $entity->bundle() . '.' . $display);

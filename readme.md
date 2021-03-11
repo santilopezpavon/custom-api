@@ -4,6 +4,8 @@ git clone https://github.com/snt1986/custom-api.git custom_api
 ## Get an Entity
 POST to url:
 * /api/{entity_type}/get/{id}
+* Body: 
+  * Schema [mandatory]
 the body have the Schema of the data that do yo need return:
 ```json
 {
@@ -36,6 +38,8 @@ the body have the Schema of the data that do yo need return:
 
 ## Create an Entity
 * /api/{entity_type}/create
+* Body: 
+  * Schema [mandatory]
 ```json
 { 
   "schema": {
@@ -48,6 +52,8 @@ the body have the Schema of the data that do yo need return:
 
 ## Update an Entity
 * /api/{entity_type}/update/{id}
+* Body: 
+  * Schema [mandatory]
 ```json
 { 
   "schema": {
@@ -63,16 +69,15 @@ the body have the Schema of the data that do yo need return:
 ## Implement View
 * /api/{view_id}/view/{display}
 * Params GET: 
-  * current_page [optional] the default value is 0
+  * current_page [optional]. The page of the pagination, the default value is 0
   * lang [optional]
 * Body: 
-  * Schema [optional]
+  * Schema [mandatory]
   * Fiters [optional]
 ```json 
 {
   "schema": {
-  	"title": []
-  	
+  	"title": []  	
   },
   "title": "ad"
 }

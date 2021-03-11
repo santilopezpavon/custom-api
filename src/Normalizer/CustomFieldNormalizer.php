@@ -14,7 +14,7 @@ class CustomFieldNormalizer extends FieldNormalizer {
 /**
    * {@inheritdoc}
    */
-  public function normalize($field, $format = NULL, array $context = array()) {    
+  public function normalize($field, $format = NULL, array $context = array()) { 
     if(count($context) > 0) {
       $name_field = $field->getName();
       if(!array_key_exists($name_field, $context)) {
