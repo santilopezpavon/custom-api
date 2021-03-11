@@ -132,14 +132,27 @@ class ApiController extends ControllerBase {
             $block_layout[$region] = array_keys($blocks);
         }
         kint($block_layout); */
+         
        /* $menu_tree = \Drupal::menuTree();
         // Build the typical default set of menu tree parameters.
         $parameters = $menu_tree->getCurrentRouteMenuTreeParameters("main");
         // Load the tree based on this set of parameters.
         $tree = $menu_tree->load("main", $parameters);*/
 
-        $tree = \Drupal::service("custom_api.menu_generator")->getMenuItems("main");
+        /*$tree = \Drupal::service("custom_api.menu_generator")->getMenuItems("main");
         kint($tree);
-        kint("hola");
+        kint("hola");*/
+
+        $multiQuery = [
+            [
+                "route" => "custom_api.getmenu",
+                "params" => [
+
+                ],
+                "body" => [
+
+                ]
+            ]
+        ];
     }
 }
