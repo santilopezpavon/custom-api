@@ -144,15 +144,47 @@ class ApiController extends ControllerBase {
         kint("hola");*/
 
         $multiQuery = [
-            [
+            "menu" => [
                 "route" => "custom_api.getmenu",
                 "params" => [
+                    "id" => "main"
+                ],
+                "query" => [
 
                 ],
                 "body" => [
 
                 ]
+            ],
+            "article" => [
+                "route" => "custom_api.getentity",
+                "params" => [
+                    "entity_type" => "node",
+                    "id" => "1"
+                ],
+                "query" => [
+
+                ],
+                "body" => [
+                    "schema" => ["display" => "default"]
+                ]
             ]
         ];
+        $client = \Drupal::httpClient();
+        
+          
+        $response = [];
+        foreach ($multiQuery as $key => $value) {
+            $url = \Drupal\Core\Url::fromRoute($value["route"], $value["params"], [
+                'absolute' => TRUE,
+                "query" => $value["query"]
+            ]);
+            $path = $url->toString();
+            $request = $client->post($path, [
+                'json' => $value["body"]
+            ]);
+            $response[$key] = json_decode($request->getBody());
+        }
+        kint($response);
     }
 }
