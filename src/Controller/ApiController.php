@@ -12,13 +12,19 @@ class ApiController extends ControllerBase {
     public function getEntityIndex($entity_type, $id) {
         $normalize = \Drupal::service("custom_api.entity_normalize");
         $resp = \Drupal::service("custom_api.entity_responses");
-
         $schema = $resp->getBodyParamater("schema", []);
-
-        // \Drupal::entityTypeManager()->getStorage('entity_view_display')->load($entity_type . '.' . $bundle . '.' . $view_mode);
+        $apply = $resp->getQueryParameter("theme");
+        
+       
 
         try {
             $output = $normalize->getEntity($entity_type, $id, $schema);
+             
+            if($apply !== FALSE) {
+                $regions = \Drupal::service("custom_api.regionsprint")->getAuxiliarContent($output, $apply);
+                return $resp->prepareResponse($regions);
+            }            
+            
             return $resp->prepareResponse($output);
         } catch (\Exception $th) {
             return $resp->prepareError($th);
@@ -28,12 +34,17 @@ class ApiController extends ControllerBase {
     public function getEntityByAlias($entity_type) {
         $normalize = \Drupal::service("custom_api.entity_normalize");
         $resp = \Drupal::service("custom_api.entity_responses");
+        $apply = $resp->getQueryParameter("theme");
 
         $schema = $resp->getBodyParamater("schema", []);
         $alias = $resp->getBodyParamater("alias");
 
         try {
             $output = $normalize->getEntityByAlias($entity_type, $alias, $schema);
+            if($apply !== FALSE) {
+                $regions = \Drupal::service("custom_api.regionsprint")->getAuxiliarContent($output, $apply);
+                return $resp->prepareResponse($regions);
+            }    
             return $resp->prepareResponse($output);
         } catch (\Exception $th) {
             return $resp->prepareError($th);
@@ -148,16 +159,34 @@ class ApiController extends ControllerBase {
         $cache->addCacheTags(\Drupal::entityTypeManager()->getDefinition('block')->getListCacheTags());
 
         kint($path); */
-        /* $block_layout = [];
-        $theme = \Drupal::theme()->getActiveTheme();
-        $regions = $theme->getRegions();
+        $data = [
+            "node_type" => 'article'
+        ];
+        
+        \Drupal::service("custom_api.regionsprint");
+
+
+
+        $block_layout = [];
+        // $theme = \Drupal::theme()->getActiveTheme();
+        //kint($theme->info->regions);
+        $theme = \Drupal::service("theme_handler")->getTheme("bartik");
+        kint($theme->info);
+        $regions = $theme->info["regions"];
+        //kint($theme);
+       // $regions = $theme->getRegions();
         foreach ($regions as $region) {  
             $blocks = \Drupal::entityTypeManager()
               ->getStorage('block')
               ->loadByProperties(['theme' => $theme->getname(), 'region' => $region]);
-            $block_layout[$region] = array_keys($blocks);
+            foreach ($blocks as $key => $block) {
+              //  kint($block);
+             //   kint($block->getVisibilityConditions());
+                kint($block->getEntityTypeId());
+            }
+            $block_layout[$region] = $blocks;
         }
-        kint($block_layout); */
+        kint($block_layout); 
          
        /* $menu_tree = \Drupal::menuTree();
         // Build the typical default set of menu tree parameters.
@@ -169,48 +198,6 @@ class ApiController extends ControllerBase {
         kint($tree);
         kint("hola");*/
 
-        $multiQuery = [
-            "menu" => [
-                "route" => "custom_api.getmenu",
-                "params" => [
-                    "id" => "main"
-                ],
-                "query" => [
-
-                ],
-                "body" => [
-
-                ]
-            ],
-            "article" => [
-                "route" => "custom_api.getentity",
-                "params" => [
-                    "entity_type" => "node",
-                    "id" => "1"
-                ],
-                "query" => [
-
-                ],
-                "body" => [
-                    "schema" => ["display" => "teaser"]
-                ]
-            ]
-        ];
-        $client = \Drupal::httpClient();
         
-          
-        $response = [];
-        foreach ($multiQuery as $key => $value) {
-            $url = \Drupal\Core\Url::fromRoute($value["route"], $value["params"], [
-                'absolute' => TRUE,
-                "query" => $value["query"]
-            ]);
-            $path = $url->toString();
-            $request = $client->post($path, [
-                'json' => $value["body"]
-            ]);
-            $response[$key] = json_decode($request->getBody());
-        }
-        kint($response);
     }
 }

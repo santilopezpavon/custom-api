@@ -11,6 +11,13 @@ class GenerateResponses {
         return new JsonResponse(["data" => $data], $code);
     }
 
+    public function getQueryParameter($key, $default = FALSE) {
+        if(array_key_exists($key, $_GET)) {
+            return $_GET[$key];
+        }
+        return $default;
+    }
+
     public function prepareError($exception, $code = 500) {
         $message = $exception->getMessage();
         $array_message = explode(":", $message);
