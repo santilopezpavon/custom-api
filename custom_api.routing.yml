@@ -4,6 +4,12 @@ custom_api.getentity:
     _controller: '\Drupal\custom_api\Controller\ApiController::getEntityIndex'
   requirements:
     _access: 'TRUE'
+custom_api.multiple:
+  path: '/api/multiple/get'
+  defaults:
+    _controller: '\Drupal\custom_api\Controller\ApiController::multipleQuery'
+  requirements:
+    _access: 'TRUE'
 custom_api.getmenu:
   path: '/api/{id}/menu'
   defaults:

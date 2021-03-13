@@ -110,6 +110,32 @@ class ApiController extends ControllerBase {
         }  
     }
 
+    public function multipleQuery() {
+        $resp = \Drupal::service("custom_api.entity_responses");
+        $multiQuery = $resp->getBodyParameters();
+        $client = \Drupal::httpClient();            
+
+        try {
+            $response = [];
+            foreach ($multiQuery as $key => $value) {
+                $url = \Drupal\Core\Url::fromRoute($value["route"], $value["params"], [
+                    'absolute' => TRUE,
+                    "query" => $value["query"]
+                ]);
+                $path = $url->toString();
+                $request = $client->post($path, [
+                    'json' => $value["body"]
+                ]);
+                $response[$key] = json_decode($request->getBody());
+            }
+            return $resp->prepareResponse($response);
+        } catch (\Exception $th) {
+            return $resp->prepareError($th);
+        } 
+        
+    }
+
+
 
     public function test(){
        /*  $master = \Drupal::requestStack()->getCurrentRequest();
@@ -166,7 +192,7 @@ class ApiController extends ControllerBase {
 
                 ],
                 "body" => [
-                    "schema" => ["display" => "default"]
+                    "schema" => ["display" => "teaser"]
                 ]
             ]
         ];

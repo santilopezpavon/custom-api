@@ -112,10 +112,40 @@ If you wish use the display configuration of the Drupal UI (display manager), in
 	"schema": {"display": "teaser"}	
 }
 ``` 
-
+# Multiple Query
+* /api/multiple/get
+* body[required]
+```javascript 
+{
+	"menu": {
+	  "route":"custom_api.getmenu",
+	  "params": {
+		  "id": "main"
+	  },
+	  "query": {
+	  
+	  },
+	  "body": {
+	  
+	  }
+	},
+	"article": {
+	  "route":"custom_api.getentity",
+	  "params": {
+		  "entity_type": "node",
+      "id": "1"
+	  },
+	  "query": {
+	  
+	  },
+	  "body": {
+		  "schema": {"display" : "default"}
+	  }
+	}
+}
+```
 # TODO:
 * Multiple Field ER for load a View Inside a Node
   - View ID
   - Display ID
   - Visualizatión (display)
-* Metatags Compatibility

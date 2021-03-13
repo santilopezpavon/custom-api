@@ -24,7 +24,9 @@ class GenerateResponses {
     public function getBodyParameters() {
         $content = \Drupal::request()->getContent();
         if(!empty($content)) {
-            return json_decode(\Drupal::request()->getContent(), true);
+             $decode = json_decode(\Drupal::request()->getContent(), true);
+
+            return $decode;
         }
         return [];
     }
