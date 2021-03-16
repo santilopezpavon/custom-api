@@ -5,7 +5,7 @@ git clone https://github.com/snt1986/custom-api.git custom_api
 POST to url:
 * /api/{entity_type}/get/{id}
 * query parameters
- * theme [voluntary]: the name of the theme, for get the regions entities. 
+  * theme [voluntary]: Theme name, for get the visible blocks of the regions. 
 * Body: 
   * Schema [mandatory]
 
@@ -90,7 +90,7 @@ the body have the Schema of the data that do yo need return:
 ## Get node by alias
 * /api/{entity_type}/alias
 * query parameters
- * theme [voluntary]: the name of the theme, for get the regions entities. 
+  * theme [voluntary]: Theme name, for get the visible blocks of the regions. 
 * Body: 
   * Schema [optional]
   * alias [mandatory]
