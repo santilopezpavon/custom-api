@@ -90,6 +90,16 @@ class EntityNormalizer {
         throw new \Exception("The entity not exists", 1);
     }
 
+    public function getAndSetLangFromAlias($alias) {
+        $array_alias = explode("/", $alias);
+        if(count($array_alias) > 1) {
+            $lang_posible = $array_alias[1];
+            if(strlen($lang_posible) == 2) {
+                $this->lang = $lang_posible;
+            }
+        }
+    }
+
     public function getEntityByAlias($target_type, $alias, $schema = []) {
         $url = Url::fromUri('internal:' . $alias);
         if ($url->isRouted()) {
