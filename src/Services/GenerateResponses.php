@@ -5,7 +5,6 @@ namespace Drupal\custom_api\Services;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-
 /**
  * Defines a class to build the Api Responses. 
  */
