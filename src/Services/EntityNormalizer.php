@@ -99,7 +99,7 @@ class EntityNormalizer {
             $entity_type = key($params);
             return  $this->getEntity($target_type, $params[$target_type], $schema); 
         }
-        throw new Exception("The entity not exists", 1);
+        throw new \Exception("The entity not exists", 1);
     }
 
     public function convertJson($entity, $schema = []) {
