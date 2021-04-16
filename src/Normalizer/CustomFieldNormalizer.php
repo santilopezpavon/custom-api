@@ -7,11 +7,8 @@ use Drupal\serialization\Normalizer\FieldNormalizer;
  * Converts typed data objects to arrays.
  */
 class CustomFieldNormalizer extends FieldNormalizer {
-  public $pre_field = null;
-  public $pre_entity = null;
 
-  public $structure = [];
-/**
+  /**
    * {@inheritdoc}
    */
   public function normalize($field, $format = NULL, array $context = array()) { 
@@ -21,8 +18,7 @@ class CustomFieldNormalizer extends FieldNormalizer {
         return NULL;
       }
     }
-    $value_field = parent::normalize($field, $format, $context);
-  
+    $value_field = parent::normalize($field, $format, $context);  
     \Drupal::service("custom_api.entity_normalize")->processField($value_field, $field, $context);
     return $value_field;     
   }

@@ -4,8 +4,6 @@ namespace Drupal\custom_api\Services;
 use Drupal\views\Views;
 use Symfony\Component\HttpFoundation\Request;
 
-
-
 class ViewControl {
     
     private $normalize; 
