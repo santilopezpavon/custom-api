@@ -11,11 +11,13 @@ class CustomEntityNormalizer extends ContentEntityNormalizer {
    * {@inheritdoc}
    */
   public function normalize($entity, $format = NULL, array $context = array()) {     
-    if(array_key_exists("display", $context)) {
+    /*if(array_key_exists("display", $context)) {
       $display = $context["display"];
       $view_display_array = \Drupal::entityTypeManager()->getStorage('entity_view_display')->load($entity->getEntityType()->id() . '.' . $entity->bundle() . '.' . $display);
+      
       if(!empty($view_display_array)) {
         $array_display = $view_display_array->toArray()["content"];
+        
         foreach ($array_display as $key => $value) {
           $options = [];
           if(
@@ -34,18 +36,15 @@ class CustomEntityNormalizer extends ContentEntityNormalizer {
         $array_display["metatag"] = [];
         $array_display["alias"] = [];
         $array_display["nid"] = [];
+        $array_display["tid"] = [];
         $array_display["type"] = [];
         $array_display["langcode"] = [];
         $context = $array_display;
       }    
-    } 
+    }   */
+    $context = \Drupal::service("custom_api.entity_control_fields_show")->generateContextEntity($entity, $context);
     
-    
-    
-    $attributes = parent::normalize($entity, $format, $context);
-    $entityNormalizer = \Drupal::service("custom_api.entity_normalize");
-    $entityNormalizer->cleanEntity($attributes);
-    
+    $attributes = parent::normalize($entity, $format, $context);   
     if(!empty($context)) {
       foreach ($attributes as $key => $value) {
        if(!array_key_exists($key, $context)) {
@@ -55,33 +54,6 @@ class CustomEntityNormalizer extends ContentEntityNormalizer {
     }
 
 
-    /*$classString = "\\Drupal\custom_api\\visualization\\NodePage";
-  $teaser = $classString::existo();
-  
-    
-    $id_type = ucfirst($entity->getEntityType()->id());
-    $bundle = ucfirst($entity->bundle());
-
-    $entityNormalizer = \Drupal::service("custom_api.entity_normalize");
-    $entityNormalizer->cleanEntity($attributes);*/   
-
-    /*foreach ($attributes as $key => $value) {
-      if(empty($value)) {
-        unset($attributes[$key]);
-      }
-    }*/
-    
-    
-    //kint($teaser);
-   /* $classString = "\\Drupal\custom_api\\visualization\\" . $id_type . $bundle;
-    if(class_exists($classString)) {
-      $visualization = $entityNormalizer->visualization;
-      kint("hola");
-      if (property_exists ($classString , $visualization ) ) {
-        kint("hola");
-      }
-    } */
-    
 
      
     return $attributes; 

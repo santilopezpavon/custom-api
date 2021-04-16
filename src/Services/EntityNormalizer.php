@@ -5,11 +5,7 @@ use Drupal\file\Entity\File;
 use Drupal\image\Entity\ImageStyle;
 
 
-class EntityNormalizer {
-    
-    private $clean = [
-        'uuid', 'uid', 'vid', "revision_timestamp", "revision_uid", "revision_log", "path", "revision_translation_affected"
-    ];
+class EntityNormalizer {  
 
     private $lang = NULL;
     
@@ -72,11 +68,7 @@ class EntityNormalizer {
         }       
     }
     
-    public function cleanEntity(&$values) {
-        foreach ($this->clean as $ignore) {
-            unset($values[$ignore]);                       
-        }        
-    }
+    
 
     public function getEntity($target_type, $target_id, $schema = []) {
         $storage = \Drupal::entityTypeManager()->getStorage($target_type);
@@ -124,30 +116,37 @@ class EntityNormalizer {
         
     }
 
-    public function cleanField(&$value_field, $field, $schema= []) {
+    public function cleanField(&$value_field, $field, $schema_base= []) {       
         for ($i=0; $i < count($value_field) ; $i++) { 
             $current = &$value_field[$i];
             if(array_key_exists("value", $current)) {
                 $current = $current["value"];
-            } else if (array_key_exists("target_id", $current) && array_key_exists("target_type", $current) && is_numeric($current["target_id"])) {
+            } else if (
+                array_key_exists("target_id", $current) && 
+                array_key_exists("target_type", $current) && 
+                is_numeric($current["target_id"])
+            ) {
                 if($current["target_type"] == 'file') {
                     $file = File::load($current["target_id"]);
                     $image_uri = $file->getFileUri();
                     $file_type = $file->getMimeType();
                     $name = $field->getName();
                     if($this->isImage($file_type)) {
-                        $img_styles = $this->processImageStyle($name, $schema, $image_uri);  
+                        $img_styles = $this->processImageStyle($name, $schema_base, $image_uri);  
                         $current["styles_img"] = $img_styles;                    
                     } 
                     $this->processFile($current);
                     
                 } else {
+                    
                     $name = $field->getName();
-                    if(array_key_exists($name, $schema)) {
-                        $schema = $schema[$name];
+                    
+                    if(array_key_exists($name, $schema_base)) {
+                        $schema = $schema_base[$name];
                     } else {
                         $schema = [];
-                    }
+                    }               
+                    
                    $current = $this->getEntity($current["target_type"], $current["target_id"], $schema);
 
                 }
