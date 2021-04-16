@@ -56,7 +56,7 @@ class EntityNormalizer {
             $entity->save();
             return $this->convertJson($entity, $schema); 
         }
-        throw new \Exception("The entity is not created", 1);
+        throw new \Exception("The entity is not created", 500);
     }
 
     public function deleteEntity($entity_type, $id) {
@@ -64,7 +64,7 @@ class EntityNormalizer {
         if(!empty($entity)) {
             $entity->delete();
         } else {
-            throw new \Exception("The entity not exists", 1);
+            throw new \Exception("The entity not exists", 404);
         }       
     }
     
@@ -79,7 +79,7 @@ class EntityNormalizer {
             }
             return $this->convertJson($entity, $schema);
         }
-        throw new \Exception("The entity not exists", 1);
+        throw new \Exception("The entity not exists", 404);
     }
 
     public function getAndSetLangFromAlias($alias) {
@@ -99,7 +99,7 @@ class EntityNormalizer {
             $entity_type = key($params);
             return  $this->getEntity($target_type, $params[$target_type], $schema); 
         }
-        throw new \Exception("The entity not exists", 1);
+        throw new \Exception("The entity not exists", 404);
     }
 
     public function convertJson($entity, $schema = []) {

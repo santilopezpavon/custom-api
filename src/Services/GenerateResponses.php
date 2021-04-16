@@ -56,12 +56,13 @@ class GenerateResponses {
      */
     public function prepareError($exception, $code = 500) {
         $message = $exception->getMessage();
+        $codeExeption = $exception->getCode();
         $array_message = explode(":", $message);
         $message_final = trim($array_message[2]);
         if(empty($message_final)) {
             $message_final = $message;
         }
-        return new JsonResponse(["message" => $message_final], $code);
+        return new JsonResponse(["message" => $message_final], $codeExeption);
     }
 
     /**
