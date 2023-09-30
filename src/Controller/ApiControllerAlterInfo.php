@@ -16,7 +16,6 @@ class ApiControllerAlterInfo extends ApiControllerBase {
 
         try {
             $entity = $normalize->createUpdateEntity($entity_type, NULL, $schema);  
-            //$entity = $normalize->convertJson($entity); 
             return $this->entity_responses->prepareResponse($entity);
         } catch (\Exception $th) {
             return $this->entity_responses->prepareError($th);
@@ -29,7 +28,6 @@ class ApiControllerAlterInfo extends ApiControllerBase {
 
         try {
             $entity = $normalize->createUpdateEntity($entity_type, $id, $schema);  
-            //$entity = $normalize->convertJson($entity); 
             return $this->entity_responses->prepareResponse($entity);
         } catch (\Exception $th) {
             return $this->entity_responses->prepareError($th);
