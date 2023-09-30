@@ -103,7 +103,6 @@ class EntityNormalizer {
     }
 
     public function convertJson($entity, $schema = []) {
-
         $array_entity = json_decode(\Drupal::service("serializer")->serialize($entity, 'json', $schema), true);
         try {
             $alias = \Drupal::service('path_alias.manager')->getAliasByPath($entity->toUrl()->toString());
@@ -112,7 +111,6 @@ class EntityNormalizer {
             //throw $th;
         }
         return $array_entity;
-
     }
     
     public function processField(&$value_field, &$field, $schema= []) {
