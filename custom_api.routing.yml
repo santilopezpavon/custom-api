@@ -1,54 +1,54 @@
 custom_api.getentity:
   path: '/api/{entity_type}/get/{id}'
   defaults:
-    _controller: '\Drupal\custom_api\Controller\ApiController::getEntityIndex'
-  requirements:
-    _access: 'TRUE'
-custom_api.multiple:
-  path: '/api/multiple/get'
-  defaults:
-    _controller: '\Drupal\custom_api\Controller\ApiController::multipleQuery'
+    _controller: '\Drupal\custom_api\Controller\ApiControllerBaseQueries::getEntityIndex'
   requirements:
     _access: 'TRUE'
 custom_api.getmenu:
   path: '/api/{id}/menu'
   defaults:
-    _controller: '\Drupal\custom_api\Controller\ApiController::getMenuById'
+    _controller: '\Drupal\custom_api\Controller\ApiControllerBaseQueries::getMenuById'
   requirements:
     _access: 'TRUE'
 custom_api.getentitybyalias:
   path: '/api/{entity_type}/alias'
   defaults:
-    _controller: '\Drupal\custom_api\Controller\ApiController::getEntityByAlias'
+    _controller: '\Drupal\custom_api\Controller\ApiControllerBaseQueries::getEntityByAlias'
   requirements:
     _access: 'TRUE'
 custom_api.getview:
   path: '/api/{view_id}/view/{display}'
   defaults:
-    _controller: '\Drupal\custom_api\Controller\ApiController::getViewIndex'
+    _controller: '\Drupal\custom_api\Controller\ApiControllerBaseQueries::getViewIndex'
   requirements:
     _access: 'TRUE'
 custom_api.createentity:
   path: '/api/{entity_type}/create'
   defaults:
-    _controller: '\Drupal\custom_api\Controller\ApiController::createEntity'
+    _controller: '\Drupal\custom_api\Controller\ApiControllerAlterInfo::createEntity'
   requirements:
     _access: 'TRUE'
 custom_api.updateentity:
   path: '/api/{entity_type}/update/{id}'
   defaults:
-    _controller: '\Drupal\custom_api\Controller\ApiController::updateEntity'
+    _controller: '\Drupal\custom_api\Controller\ApiControllerAlterInfo::updateEntity'
   requirements:
     _access: 'TRUE'
 custom_api.deleteentity:
   path: '/api/{entity_type}/delete/{id}'
   defaults:
-    _controller: '\Drupal\custom_api\Controller\ApiController::deleteEntity'
+    _controller: '\Drupal\custom_api\Controller\ApiControllerAlterInfo::deleteEntity'
   requirements:
     _access: 'TRUE'
 custom_api.test:
   path: '/api/test/test/test'
   defaults:
-    _controller: '\Drupal\custom_api\Controller\ApiController::test'
+    _controller: '\Drupal\custom_api\Controller\ApiControllerAdvancedQueries::test'
+  requirements:
+    _access: 'TRUE'
+custom_api.multiple:
+  path: '/api/multiple/get'
+  defaults:
+    _controller: '\Drupal\custom_api\Controller\ApiControllerAdvancedQueries::multipleQuery'
   requirements:
     _access: 'TRUE'

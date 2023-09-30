@@ -11,7 +11,7 @@ class EntityControlFieldsShow {
     *
     * @var Array
     */
-    private $mandatory_properties = ["title", "metatag", "name", "alias", "nid", "tid", "type", "langcode"];
+    private $mandatory_properties = ["title", "metatag", "name", "alias", "nid", "id","tid", "type", "langcode"];
 
    /**
     * The structure for print the Entity and the childs.

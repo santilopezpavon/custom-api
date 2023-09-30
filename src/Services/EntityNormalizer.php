@@ -114,8 +114,7 @@ class EntityNormalizer {
     }
     
     public function processField(&$value_field, &$field, $schema= []) {
-        $this->cleanField($value_field, $field, $schema);
-        
+        $this->cleanField($value_field, $field, $schema);        
     }
 
     public function cleanField(&$value_field, $field, $schema_base= []) {       
