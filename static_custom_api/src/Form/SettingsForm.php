@@ -30,7 +30,11 @@ class SettingsForm extends ConfigFormBase {
     //dump($resp);
 
     //\Drupal::service("static_custom_api.config_cache")->isEntitySaveable("node", "pepito");
-        
+   /* $fileSystem = \Drupal::service('file_system');
+    $publicDirectory = $fileSystem->realpath("public://");  
+    dump($publicDirectory);
+    dump(file_create_url("public://photos/hello.jpg"));*/
+
     $form["node_bundles"] = [
         '#type' => 'checkboxes',
         '#title' => t('Bundles Nodes'),

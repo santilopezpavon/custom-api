@@ -71,7 +71,9 @@ class EntityNormalizer {
     
 
     public function getEntity($target_type, $target_id, $schema = []) {
-        $response = \Drupal::service("static_custom_api.files_cache")->getEntityJson($target_type, $target_id, $this->lang);
+        $response = NULL;
+        \Drupal::service("module_handler")->invokeAll('custom_api_response_entity_alter', [&$response, $target_type, $target_id, $this->lang]);
+
         if(empty($response)) {
             $storage = \Drupal::entityTypeManager()->getStorage($target_type);
             $entity = $storage->load($target_id);
@@ -132,11 +134,13 @@ class EntityNormalizer {
 
     public function convertJson($entity, $schema = []) {
         $array_entity = json_decode(\Drupal::service("serializer")->serialize($entity, 'json', $schema), true);
-        $array_entity["legacy"] = [
+        $legacy_data = [
             "entity_type" => $entity->getEntityTypeId(),
             "entity_id" => $entity->id(),
             "entity_bundle" => $entity->bundle()
         ];
+        \Drupal::service("module_handler")->invokeAll('custom_api_legacy_data_alter', [&$legacy_data]);
+        $array_entity["legacy"] = $legacy_data;;
         try {
             $alias = \Drupal::service('path_alias.manager')->getAliasByPath($entity->toUrl()->toString());
             $array_entity["alias"] = $alias;    

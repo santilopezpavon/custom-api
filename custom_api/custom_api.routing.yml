@@ -16,6 +16,12 @@ custom_api.getentitybyalias:
     _controller: '\Drupal\custom_api\Controller\ApiControllerBaseQueries::getEntityByAlias'
   requirements:
     _access: 'TRUE'
+custom_api.getentityinfobyalias:
+  path: '/api/{entity_type}/info-alias'
+  defaults:
+    _controller: '\Drupal\custom_api\Controller\ApiControllerBaseQueries::getEntityInfoByAlias'
+  requirements:
+    _access: 'TRUE'
 custom_api.getview:
   path: '/api/{view_id}/view/{display}'
   defaults:

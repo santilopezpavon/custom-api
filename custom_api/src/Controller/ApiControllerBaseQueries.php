@@ -4,6 +4,7 @@ use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Drupal\custom_api\Controller\ApiControllerBase;
+use Drupal\Core\Url;
 
 
 class ApiControllerBaseQueries extends ApiControllerBase {
@@ -37,6 +38,28 @@ class ApiControllerBaseQueries extends ApiControllerBase {
         } catch (\Exception $th) {
             return $this->entity_responses->prepareError($th);
         }        
+    }
+
+
+    public function getEntityInfoByAlias($entity_type) {
+        $start = microtime(true);
+
+        $alias = $this->entity_responses->getBodyParamater("alias");
+        try {
+            $output = [];
+            $url = Url::fromUri('internal:' . $alias);
+            if ($url->isRouted()) {
+                $params = $url->getRouteParameters();
+                $entity_type = key($params);
+                $output["entity_type"] = $entity_type;
+                $output["id"] = $params[$entity_type];
+                \Drupal::service("module_handler")->invokeAll('custom_api_response_output_alias_alter', [&$output]);
+
+            }
+            return $this->entity_responses->prepareResponse($output);
+        } catch (\Exception $th) {
+            return $this->entity_responses->prepareError($th);
+        } 
     }
 
   /**

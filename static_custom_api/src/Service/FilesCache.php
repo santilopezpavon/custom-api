@@ -14,7 +14,7 @@ class FilesCache {
             return NULL;
         }
 
-        $response = $entity_serialized;       
+        $response = $entity_serialized;      
         try {
             $this->deleteFileIfExists($entity_type, $id, $lang);
         } catch (\Throwable $th) {
@@ -76,18 +76,31 @@ class FilesCache {
 
     public function createJsonFile($entity_array, $entity_type, $id, $lang = '') {
        $filename = $this->getFileName($entity_type, $id, $lang);
-        
-       $fileSystem = \Drupal::service('file_system');
-       $publicDirectory = $fileSystem->realpath("public://");  
 
        $directorio = 'public://' . $this->base_folder_files;
        \Drupal::service('file_system')->prepareDirectory($directorio, \Drupal\Core\File\FileSystemInterface::CREATE_DIRECTORY);
+
+       $url = "public://" . $this->base_folder_files . '/' . $filename;
+
+       $fileSystem = \Drupal::service('file_system');
+       $server_path = $fileSystem->realpath($url);  
+
        
-       $filePath = $publicDirectory . '/' . $this->base_folder_files . '/' . $filename;
-       $fileSystem->saveData(json_encode($entity_array), $filePath, \Drupal\Core\File\FileSystemInterface::EXISTS_REPLACE); 
+       
+
+       $entity_array["file_json_uri"] = $server_path;
+       $entity_array["file_json_url"] = $this->getUrlFileName($entity_type, $id, $lang);
+
+       $fileSystem->saveData(json_encode($entity_array), $server_path, \Drupal\Core\File\FileSystemInterface::EXISTS_REPLACE); 
+    }
+
+    public function getUrlFileName($entity_type, $id, $lang = '') {
+        $filename = $this->getFileName($entity_type, $id, $lang);
+        $url = "public://" . $this->base_folder_files . '/' . $filename;
+        return file_create_url($url);
     }
    
-    private function getFileName($entity_type, $id, $lang = '') {
+    public function getFileName($entity_type, $id, $lang = '') {
        return $entity_type  . "--" . $id . "--" . $lang . ".json";
     }
 }
