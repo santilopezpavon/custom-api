@@ -1,0 +1,5 @@
+services:
+ static_custom_api.config_cache:
+  class: Drupal\static_custom_api\Service\ConfigCache
+ static_custom_api.files_cache:
+  class: Drupal\static_custom_api\Service\FilesCache

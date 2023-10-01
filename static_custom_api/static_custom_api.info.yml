@@ -1,7 +1,7 @@
 type: module
-name: Custom Api
-description: 'Custom API.'
+name: Static Custom Api
+description: 'Static Custom API.'
 package: API
 core_version_requirement: ^8.8 || ^9
 dependencies:
-  - serialization
+  - custom_api

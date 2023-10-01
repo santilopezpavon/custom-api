@@ -18,7 +18,7 @@ class EntityNormalizer {
     public function __construct() {
         $request = \Drupal::request();
 
-        $this->lang = $request->query->get("lang");
+        $this->lang =  \Drupal::languageManager()->getCurrentLanguage()->getId();
         
         $content = \Drupal::request()->getContent();
         if(!empty($content)) {
@@ -71,26 +71,56 @@ class EntityNormalizer {
     
 
     public function getEntity($target_type, $target_id, $schema = []) {
-        $storage = \Drupal::entityTypeManager()->getStorage($target_type);
-        $entity = $storage->load($target_id);
-        if(!empty($entity)) {
-            if($entity->hasTranslation($this->lang)){
-                $entity = $entity->getTranslation($this->lang);
+        $response = \Drupal::service("static_custom_api.files_cache")->getEntityJson($target_type, $target_id, $this->lang);
+        if(empty($response)) {
+            $storage = \Drupal::entityTypeManager()->getStorage($target_type);
+            $entity = $storage->load($target_id);
+            if(!empty($entity)) {
+                if($entity->hasTranslation($this->lang)){
+                    $entity = $entity->getTranslation($this->lang);
+                }
+                $entity_serialized = $this->convertJson($entity, $schema);
+                \Drupal::service("module_handler")->invokeAll('custom_api_get_entity_alter', [&$entity_serialized, $target_type, $entity->bundle(), $target_id, $this->lang]);
+                return $entity_serialized;
             }
-            return $this->convertJson($entity, $schema);
+            throw new \Exception("The entity not exists", 404);
+        } else {
+            $response = $this->jsonSerialize($response, $target_type, $schema);
+            return $response;
+        }        
+    } 
+
+    private function jsonSerialize(&$json_to_serialize, $target_type, $schema = []) {
+        $et = $target_type;
+        $bundle = $json_to_serialize["type"][0]["target_id"];
+        $attributes = \Drupal::service("custom_api.entity_control_fields_show")->generateContextEntityByEntityTypeAndBundle($et, $bundle, $schema);
+        foreach ($json_to_serialize as $key => $value) {
+            if(!array_key_exists($key, $attributes)) {
+                unset($json_to_serialize[$key]);
+            }
         }
-        throw new \Exception("The entity not exists", 404);
+
+        //dump($attributes);
+        //dump($json_to_serialize);
+        foreach ($json_to_serialize as $field_name => &$value_field) {
+            if(is_array($value_field)) {
+                foreach ($value_field as &$item_array) {
+                    if(
+                        is_array($item_array) && 
+                        array_key_exists("legacy", $item_array) &&
+                        array_key_exists("entity_id", $item_array["legacy"]) &&
+                        array_key_exists("entity_bundle", $item_array["legacy"])
+                    ) {
+                        $item_array = $this->getEntity($item_array["legacy"]["entity_type"], $item_array["legacy"]["entity_id"], $attributes[$field_name]);
+                       // dump($item_array);
+                    }
+                }
+            }
+        }
+        return $json_to_serialize;
     }
 
-    public function getAndSetLangFromAlias($alias) {
-        $array_alias = explode("/", $alias);
-        if(count($array_alias) > 1) {
-            $lang_posible = $array_alias[1];
-            if(strlen($lang_posible) == 2) {
-                $this->lang = $lang_posible;
-            }
-        }
-    }
+    
 
     public function getEntityByAlias($target_type, $alias, $schema = []) {
         $url = Url::fromUri('internal:' . $alias);
@@ -104,6 +134,11 @@ class EntityNormalizer {
 
     public function convertJson($entity, $schema = []) {
         $array_entity = json_decode(\Drupal::service("serializer")->serialize($entity, 'json', $schema), true);
+        $array_entity["legacy"] = [
+            "entity_type" => $entity->getEntityTypeId(),
+            "entity_id" => $entity->id(),
+            "entity_bundle" => $entity->bundle()
+        ];
         try {
             $alias = \Drupal::service('path_alias.manager')->getAliasByPath($entity->toUrl()->toString());
             $array_entity["alias"] = $alias;    
@@ -120,14 +155,15 @@ class EntityNormalizer {
     public function cleanField(&$value_field, $field, $schema_base= []) {       
         for ($i=0; $i < count($value_field) ; $i++) { 
             $current = &$value_field[$i];
-            if(array_key_exists("value", $current)) {
+            if(is_array($current) && array_key_exists("value", $current)) {
                 $current = $current["value"];
             } else if (
+                is_array($current) &&
                 array_key_exists("target_id", $current) && 
                 array_key_exists("target_type", $current) && 
                 is_numeric($current["target_id"])
             ) {
-                if($current["target_type"] == 'file') {
+                if(is_array($current) && $current["target_type"] == 'file') {
                     $file = File::load($current["target_id"]);
                     $image_uri = $file->getFileUri();
                     $file_type = $file->getMimeType();
@@ -146,9 +182,10 @@ class EntityNormalizer {
                         $schema = $schema_base[$name];
                     } else {
                         $schema = [];
-                    }       
+                    }   
+                  
                    $current = $this->getEntity($current["target_type"], $current["target_id"], $schema);
-
+                    
                 }
             } 
         }   

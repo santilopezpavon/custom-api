@@ -49,6 +49,38 @@ class EntityControlFieldsShow {
         return $array_display;        
     }
 
+    public function generateContextEntityByEntityTypeAndBundle($entity_type, $bundle, $context = []) {
+      $view_display_array = $this->getDispayInfoEntityByEntityTypeAndBundle($entity_type, $bundle, $context);
+      if($view_display_array === FALSE) {
+        return $context;
+      }
+      $array_display = $view_display_array->toArray()["content"];
+      foreach ($array_display as $key => $value) {
+        $options = [];
+        if(array_key_exists("settings", $value)) {
+          if(array_key_exists("view_mode", $value["settings"]) ) {
+            $options["display"] = $value["settings"]["view_mode"];
+          }
+          if(array_key_exists("image_style", $value["settings"]) ) {
+            $options = [$value["settings"]["image_style"]];
+          }          
+        }
+        $array_display[$key] = $options;  
+      }
+      foreach ($this->mandatory_properties as $value) {
+        $array_display[$value] = [];
+      }
+      return $array_display;
+    }
+
+    public function getDispayInfoEntityByEntityTypeAndBundle($entity_type, $bundle, $context = []) {
+      if(array_key_exists("display", $context)) {
+        $display = $context["display"];
+        return \Drupal::entityTypeManager()->getStorage('entity_view_display')->load($entity_type. '.' . $bundle . '.' . $display);
+      }
+      return FALSE;
+    }
+
     /**
     * The display information for the entity.
     *
@@ -68,5 +100,7 @@ class EntityControlFieldsShow {
       }
       return FALSE;
     }
+
+
 
 }

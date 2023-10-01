@@ -1,0 +1,32 @@
+<?php
+
+function static_custom_api_custom_api_get_entity_alter(&$entity_serialized, $entity_type, $bundle, $id, $lang) {
+  \Drupal::service("static_custom_api.files_cache")->saveEntitySerialized($entity_serialized, $entity_type, $bundle, $id, $lang);
+}
+
+function static_custom_api_entity_insert(\Drupal\Core\Entity\EntityInterface $entity) {
+    \Drupal::service("static_custom_api.files_cache")->saveEntityJson($entity);
+}
+
+
+  
+  /**
+   * Implements hook_entity_update().
+   */
+  function static_custom_api_entity_update(\Drupal\Core\Entity\EntityInterface $entity) {
+    \Drupal::service("static_custom_api.files_cache")->saveEntityJson($entity);
+  }
+  
+  /**
+   * Implements hook_entity_delete().
+   */
+  function static_custom_api_entity_delete(\Drupal\Core\Entity\EntityInterface $entity) {
+    // Realiza acciones adicionales antes de que se elimine una entidad.
+    // Por ejemplo, puedes eliminar archivos relacionados con la entidad.
+   /* $target_type = $entity->getEntityTypeId();
+    $bundle = $entity->bundle();
+    $id = $entity->id();
+    \Drupal::logger("static_custom_api_entity_delete")->alert(print_r($target_type, true));;
+    \Drupal::logger("static_custom_api_entity_delete")->alert(print_r($bundle, true));;
+    \Drupal::logger("static_custom_api_entity_delete")->alert(print_r($id, true));*/
+  }

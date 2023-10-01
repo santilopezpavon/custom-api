@@ -26,7 +26,7 @@ class ApiControllerBaseQueries extends ApiControllerBase {
     public function getEntityIndex($entity_type, $id) {
         $schema = $this->entity_responses->getBodyParamater("schema", []);
         $apply = $this->entity_responses->getQueryParameter("theme");    
-
+        $schema["deep"] = 0;
         try {
             $output = $this->entity_normalize->getEntity($entity_type, $id, $schema);
             if($apply !== FALSE) {
