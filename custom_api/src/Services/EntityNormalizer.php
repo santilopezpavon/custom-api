@@ -100,8 +100,6 @@ class EntityNormalizer {
             }
         }
 
-        //dump($attributes);
-        //dump($json_to_serialize);
         foreach ($json_to_serialize as $field_name => &$value_field) {
             if(is_array($value_field)) {
                 foreach ($value_field as &$item_array) {

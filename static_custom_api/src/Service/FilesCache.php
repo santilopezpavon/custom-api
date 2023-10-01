@@ -62,10 +62,15 @@ class FilesCache {
             $publicDirectory = $fileSystem->realpath("public://");        
             $filename = $this->getFileName($entity_type, $id, $lang);
             $filePath = $publicDirectory . '/' . $this->base_folder_files . '/' . $filename;
-            return json_decode(file_get_contents($filePath), true);
+            if (file_exists($filePath)) {
+                return json_decode(file_get_contents($filePath), true);
+            }
+            
         } catch (\Throwable $th) {
             //throw $th;
         }
+
+        return NULL;
         
     }
 
