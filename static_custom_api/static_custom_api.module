@@ -1,37 +1,14 @@
 <?php
 
-function static_custom_api_custom_api_get_entity_alter(&$entity_serialized, $entity_type, $bundle, $id, $lang) {
-  \Drupal::service("static_custom_api.files_cache")->saveEntitySerialized($entity_serialized, $entity_type, $bundle, $id, $lang);
-}
-
-
-function static_custom_api_custom_api_response_entity_alter(&$response, $target_type, $target_id, $lang) {
-     $response = \Drupal::service("static_custom_api.files_cache")->getEntityJson($target_type, $target_id, $lang);
-
-}
-
-function static_custom_api_custom_api_legacy_data_alter(&$legacy_data) {
-  $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
-  $legacy_data["file_json_url"] = \Drupal::service("static_custom_api.files_cache")->getUrlFileName($legacy_data["entity_type"], $legacy_data["entity_id"], $language);
-}
-
-
-function static_custom_api_custom_api_response_output_alias_alter(&$output) {
-  $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
-  $output["file_json_url"] = \Drupal::service("static_custom_api.files_cache")->getUrlFileName($output["entity_type"], $output["id"], $language);
-}
-
-function static_custom_api_entity_insert(\Drupal\Core\Entity\EntityInterface $entity) {
-    \Drupal::service("static_custom_api.files_cache")->saveEntityJson($entity);
-}
-
-
+  function static_custom_api_entity_insert(\Drupal\Core\Entity\EntityInterface $entity) {
+      \Drupal::service("static_custom_api.files_cache")->saveEntity($entity);
+  }
   
   /**
    * Implements hook_entity_update().
    */
   function static_custom_api_entity_update(\Drupal\Core\Entity\EntityInterface $entity) {
-    \Drupal::service("static_custom_api.files_cache")->saveEntityJson($entity);
+    \Drupal::service("static_custom_api.files_cache")->saveEntity($entity);
   }
   
   /**

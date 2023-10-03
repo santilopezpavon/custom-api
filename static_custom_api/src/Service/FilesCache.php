@@ -9,98 +9,92 @@ class FilesCache {
 
     private $base_folder_files = 'custom-build';
 
-    public function saveEntitySerialized($entity_serialized, $entity_type, $bundle, $id, $lang) {
-        if(!\Drupal::service('static_custom_api.config_cache')->isEntitySaveable($entity_type, $bundle)) {
-            return NULL;
+    private $entity_type_cached = ["node", "paragraph", "taxonomy_term", "media", "menu", "block_content"];
+
+    public function saveEntity($entity) {
+        $entity_data_for_json = $this->getEntityDataForSaveJson($entity);
+        if(!in_array($entity_data_for_json["target_type"], $this->entity_type_cached)) {
+            return FALSE;
+        }
+        $subfolder_directory = $this->getSubFolderEntityJson(
+            $entity_data_for_json["target_type"],
+            $entity_data_for_json["id"]
+        );       
+
+        $this->prepareFolder($subfolder_directory);
+        $path_file = $this->getPathFile($entity_data_for_json);
+        $this->saveEntityInJson($entity, $path_file["real_path_file"], $path_file["file_url"]);
+    }
+
+    public function getEntityFile($target_type, $id, $lang) {
+        if(!in_array($target_type, $this->entity_type_cached)) {
+            return FALSE;
         }
 
-        $response = $entity_serialized;      
-        try {
-            $this->deleteFileIfExists($entity_type, $id, $lang);
-        } catch (\Throwable $th) {
-            $message = $th->getMessage();
-            \Drupal::logger("FilesCache")->alert(print_r($message, true));
-        }
-        if($response !== NULL) {
-            $this->createJsonFile($response, $entity_type, $id, $lang);
-        }   
+        $path_file = $this->getPathFile([
+            "target_type" => $target_type,
+            "id" => $id,
+            "lang" => $lang
+        ]);
+        $path_file_real = $path_file["real_path_file"];
+        if(file_exists($path_file_real)) {
+
+            return json_decode(file_get_contents($path_file_real), true);
+        } 
+
+        return FALSE;
     }
 
-    public function saveEntityJson($entity) {
-       
-        $entity_type = $entity->getEntityTypeId();
-        $bundle = $entity->bundle();
-        if(!\Drupal::service('static_custom_api.config_cache')->isEntitySaveable($entity_type, $bundle)) {
-            return NULL;
-        }
-        $id = $entity->id();
-        $lang = $entity->language()->getId(); 
-        $response = NULL;       
-        try {
-            $this->deleteFileIfExists($entity_type, $id, $lang);
-            $response = \Drupal::service("custom_api.entity_normalize")->getEntity($entity_type, $id, ["display"=> 'default']);
-        } catch (\Throwable $th) {
-            $message = $th->getMessage();
-            \Drupal::logger("FilesCache")->alert(print_r($message, true));
-        }
-        if($response !== NULL) {
-            $this->createJsonFile($response, $entity_type, $id, $lang);
-        }       
+    private function saveEntityInJson($entity, $file_path, $file_url) {
+        $json_entity = \Drupal::service("serializer")->serialize($entity, 'json', []);
+        // $json_entity = json_encode($entity_array);
+        \Drupal::service('file_system')->saveData($json_entity, $file_path, \Drupal\Core\File\FileSystemInterface::EXISTS_REPLACE); 
     }
 
-    private function deleteFileIfExists($entity_type, $id, $lang) {
-        $fileSystem = \Drupal::service('file_system');
-        $publicDirectory = $fileSystem->realpath("public://"); 
-        $filename = $this->getFileName($entity_type, $id, $lang);
-        $filePath = $publicDirectory . '/' . $this->base_folder_files . '/' . $filename;
-        \Drupal::service('file_system')->delete($filePath, \Drupal\Core\File\FileSystemInterface::EXISTS_REPLACE);
+    public function getPathFile($entity_data_for_json) {
+
+        $subfolder_directory = $this->getSubFolderEntityJson(
+            $entity_data_for_json["target_type"],
+            $entity_data_for_json["id"]
+        );
+
+        $file_name = $this->getFileName(
+            $entity_data_for_json["target_type"],
+            $entity_data_for_json["id"],
+            $entity_data_for_json["lang"]
+        );
+
+        $path_file = $subfolder_directory . "" . $file_name;
+
+        return [
+            "path_file" => $path_file,
+            "real_path_file" => \Drupal::service('file_system')->realpath($path_file),
+            "file_url" => file_create_url($path_file)
+        ];
     }
 
-    public function getEntityJson($entity_type, $id, $lang = '') { 
-        try {
-            $fileSystem = \Drupal::service('file_system');
-            $publicDirectory = $fileSystem->realpath("public://");        
-            $filename = $this->getFileName($entity_type, $id, $lang);
-            $filePath = $publicDirectory . '/' . $this->base_folder_files . '/' . $filename;
-            if (file_exists($filePath)) {
-                return json_decode(file_get_contents($filePath), true);
-            }
-            
-        } catch (\Throwable $th) {
-            //throw $th;
-        }
-
-        return NULL;
-        
+    private function prepareFolder($folder) {
+        \Drupal::service('file_system')->prepareDirectory($folder, \Drupal\Core\File\FileSystemInterface::CREATE_DIRECTORY);
     }
 
-    public function createJsonFile($entity_array, $entity_type, $id, $lang = '') {
-       $filename = $this->getFileName($entity_type, $id, $lang);
-
-       $directorio = 'public://' . $this->base_folder_files;
-       \Drupal::service('file_system')->prepareDirectory($directorio, \Drupal\Core\File\FileSystemInterface::CREATE_DIRECTORY);
-
-       $url = "public://" . $this->base_folder_files . '/' . $filename;
-
-       $fileSystem = \Drupal::service('file_system');
-       $server_path = $fileSystem->realpath($url);  
-
-       
-       
-
-       $entity_array["file_json_uri"] = $server_path;
-       $entity_array["file_json_url"] = $this->getUrlFileName($entity_type, $id, $lang);
-
-       $fileSystem->saveData(json_encode($entity_array), $server_path, \Drupal\Core\File\FileSystemInterface::EXISTS_REPLACE); 
+    private function getEntityDataForSaveJson($entity) {
+        return [
+            "target_type" => $entity->getEntityTypeId(),
+            "bundle" => $entity->bundle(),
+            "id" => $entity->id(),
+            "lang" => $entity->language()->getId()
+        ];
     }
 
-    public function getUrlFileName($entity_type, $id, $lang = '') {
-        $filename = $this->getFileName($entity_type, $id, $lang);
-        $url = "public://" . $this->base_folder_files . '/' . $filename;
-        return file_create_url($url);
+    private function getFileName($target_type, $id, $lang) {
+        return $target_type . "--" . $id . "--" . $lang . ".json";
     }
-   
-    public function getFileName($entity_type, $id, $lang = '') {
-       return $entity_type  . "--" . $id . "--" . $lang . ".json";
+
+    private function getSubFolderEntityJson($target_type, $id) {
+        $folder1 = number_format($id / 200, 0);
+        $folder2 = number_format($folder1 / 200, 0);
+        $folder3 = number_format($folder2 / 200, 0);
+
+        return "public://custom-build" . "/" . $target_type . "/" . $folder1 . "/" . $folder2 . "/" . $folder3 . "/";
     }
 }
