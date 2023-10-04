@@ -1,5 +1,5 @@
-static_custom_api.formulario:
-  path: '/admin/static-custom-api/formulario'
+static_custom_api.batch_operations:
+  path: '/admin/static-custom-api/batch-process'
   defaults:
     _controller: '\Drupal\static_custom_api\Controller\BuildController::mostrarFormulario'
     _title: 'Ejemplo de Batch API'

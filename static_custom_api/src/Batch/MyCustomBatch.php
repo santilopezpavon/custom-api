@@ -29,14 +29,22 @@ class MyCustomBatch {
    * Process a single line.
    */
   public static function importLine($type_content, $id_content, &$context) {
-    //$context['results']['rows_imported']++;
-    //$line = array_map('base64_decode', $line);
-    //$context['message'] = t('Importing row ' . $context['results']['rows_imported']);
-    \Drupal::logger("import")->alert(print_r($id_content, true));;
-    /* 
-      Añadimos aquí el procesado que necesitemos hacer.
-    */
-    //dump($context);
+    $files_cache_service = \Drupal::service("static_custom_api.files_cache");
+
+    $storage = \Drupal::entityTypeManager()->getStorage($type_content);
+    $entity = $storage->load($id_content);
+
+    if(
+      !empty($entity) && $entity->isTranslatable() 
+    ) {
+      $trans_languages = $entity->getTranslationLanguages();
+      foreach ($trans_languages as $trans_language) {
+        $entity_trans = $entity->getTranslation($trans_language);
+        $files_cache_service->saveEntity($entity_trans);
+      }
+    } elseif(!empty($entity)) {
+      $files_cache_service->saveEntity($entity);
+    }    
   }
 
 }

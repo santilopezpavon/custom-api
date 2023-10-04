@@ -33,21 +33,17 @@ class BuildController extends ControllerBase {
     //\Drupal::service("custom_api.entity_control_fields_show");
 */
 
-    $url_generator = \Drupal::service('url_generator');
-    $url = $url_generator->generateFromRoute('custom_api.getentity', [
-      "entity_type" => 'node', "id" => 1
-    ], ['absolute' => TRUE]);
-    dump($url);
-    $client = \Drupal::httpClient();
-    $request = $client->post($url, [
-      'json' => [
-        'schema'=> ["display" => 'default']
-      ]
-    ]);
-    $response = json_decode($request->getBody());
-    dump("hola");
-    dump($response);
-    exit();
+    $all_entity_types = \Drupal::entityTypeManager()->getDefinitions();
+    $files_cache_service = \Drupal::service("static_custom_api.files_cache");
+    $entity_types_cacheable = [];
+    foreach ($all_entity_types as $entity_type => $value) {
+      if($files_cache_service->isEntityTypeJsonAble($entity_type)) {
+        $entity_types_cacheable[] = $entity_type;
+      }
+    }
+
+    
+    
     $batch = [
       'title'            => 'Importing CSV...',
       'operations'       => [],
@@ -57,14 +53,18 @@ class BuildController extends ControllerBase {
       'finished'         => '\Drupal\static_custom_api\Batch\MyCustomBatch::importFinished',
     ];
 
-    $query = \Drupal::entityQuery('paragraph');
-    $results = $query->execute();
-    foreach ($results as $key => $value) {
-      $batch['operations'][] = [
-        '\Drupal\static_custom_api\Batch\MyCustomBatch::importLine',
-        ['paragraph', $value],
-      ];
+    foreach ($entity_types_cacheable as $type_cacheable) {
+      $query = \Drupal::entityQuery('paragraph');
+      $results = $query->execute();
+      foreach ($results as $key => $value) {
+        $batch['operations'][] = [
+          '\Drupal\static_custom_api\Batch\MyCustomBatch::importLine',
+          [$type_cacheable, $value],
+        ];
+      }
     }
+
+    
     batch_set($batch);
     return batch_process('user');
   }

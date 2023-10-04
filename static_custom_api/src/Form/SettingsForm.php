@@ -20,35 +20,12 @@ class SettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('static_custom_api.settings');
     
-    /*$storage = \Drupal::entityTypeManager()->getStorage("node");
-    $entity = $storage->load(3);
-    \Drupal::service("static_custom_api.files_cache")->saveEntity($entity);*/
-    // Serializar una entidad
-    /*$storage = \Drupal::entityTypeManager()->getStorage("node");
-    $entity = $storage->load(3);
-    $json_entity = \Drupal::service("serializer")->serialize($entity, 'json', []);
-    $array_entity = json_decode($json_entity, true);
-    dump($array_entity);
+    dump("hola");
+    $storage = \Drupal::entityTypeManager()->getStorage("menu");
+    $entity_db = $storage->load("main");
 
-    // Prepare Directory
-    $folder1 = number_format($id / 100, 0);
-    $folder2 = number_format($folder1 / 100, 0);
-
-    $base_folder = "public://custom-build" . "/" . $folder1 . "/" . $folder2 . "/node";
-    \Drupal::service('file_system')->prepareDirectory($base_folder, \Drupal\Core\File\FileSystemInterface::CREATE_DIRECTORY);
-
-    // Prepare File
-    $file_path = $base_folder . '/' . "3-" . $entity->language()->getId() . ".json";
-    dump($base_folder);
-    dump($file_path);
-
-    $server_path = \Drupal::service('file_system')->realpath($file_path); 
-    dump($server_path);
-    \Drupal::service('file_system')->saveData($json_entity, $file_path, \Drupal\Core\File\FileSystemInterface::EXISTS_REPLACE); 
-    dump("end");*/
-
-    //         \Drupal::service('file_system')->delete($filePath, \Drupal\Core\File\FileSystemInterface::EXISTS_REPLACE);
-
+    \Drupal::service("static_custom_api.files_cache")->saveEntity($entity_db);
+    dump($entity_db);
 
     $form["node_bundles"] = [
         '#type' => 'checkboxes',
