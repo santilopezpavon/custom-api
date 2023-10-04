@@ -1,27 +1,14 @@
 <?php
 namespace Drupal\static_custom_api\Batch;
 
-use Drupal\Core\File\FileSystemInterface;
-
-/**
- * Methods for running the CSV import in a batch.
- *
- * @package Drupal\my_custom_module
- */
-class MyCustomBatch {
+class BatchJsonOperations {
 
   /**
    * Handle batch completion.
    */
   public static function importFinished($success, $results, $operations) {
     $messenger = \Drupal::messenger();
-    //$messenger->addMessage('Imported ' . $results['rows_imported'] . ' rows.');
-
-   /* 
-      Añadimos aquí cualquier ejecución final que necesitemos.
-   */
-
-    return 'The CSV import has completed.';
+    return 'The JSONs creation has completed.';
   }
 
 

@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class FilesCache {
 
     private $base_folder_files = 'custom-build';
-    private $entity_type_cached = ["node", "paragraph", "taxonomy_term", "media", "menu", "block_content"];
+    private $entity_type_cached;
     
     /**
      * The File System service.
@@ -42,6 +42,12 @@ class FilesCache {
     public function __construct(FileSystemInterface $fileSystem, Serializer $serializer) {
         $this->fileSystem = $fileSystem;
         $this->serializer = $serializer;
+        $this->entity_type_cached = [];
+
+        $config = \Drupal::config("static_custom_api.settings")->get("content_types_array");
+        if(is_array($config)) {
+            $this->entity_type_cached = \Drupal::config("static_custom_api.settings")->get("content_types_array");
+        } 
     }   
 
     /**
