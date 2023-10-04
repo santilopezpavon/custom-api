@@ -22,6 +22,8 @@ class SettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('static_custom_api.settings');
 
+    
+
     $form["content_types"] = [
         '#type' => 'checkboxes',
         '#title' => t('Entity Types'),
@@ -52,11 +54,6 @@ class SettingsForm extends ConfigFormBase {
 
     parent::submitForm($form, $form_state);
   }
-
-  function not_zero($value) {
-    return $value != 0;
-  }
-
 
   
   private function getAllContentTypes() {
